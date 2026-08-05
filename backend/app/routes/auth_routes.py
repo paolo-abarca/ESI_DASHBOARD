@@ -1,5 +1,6 @@
 from flask import Blueprint, request
 from app.services.auth_service import AuthService
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -44,4 +45,21 @@ def login():
                 "email": profesor["email"]
             }
         }
+    }
+
+@auth_bp.get("/auth/me")
+@jwt_required()
+def me():
+    profesor_id = int(get_jwt_identity())
+    profesor = AuthService.me(profesor_id)
+
+    if profesor is None:
+        return {
+            "success": False,
+            "message": "Profesor no encontrado."
+        }, 404
+
+    return {
+        "success": True,
+        "data": profesor
     }
