@@ -17,7 +17,7 @@ class AuthService:
             return None
 
         access_token = create_access_token(
-            identity=str(profesor["_id"]),
+            identity=str(profesor["id"]),
             additional_claims={
                 "email": profesor["email"],
                 "nombre": profesor["nombre"]
@@ -28,3 +28,12 @@ class AuthService:
             "profesor": profesor,
             "access_token": access_token
         }
+
+    @staticmethod
+    def me(profesor_id: int):
+        profesor = AuthRepository.find_by_id(profesor_id)
+
+        if profesor is None:
+            return None
+
+        return profesor

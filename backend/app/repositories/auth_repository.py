@@ -37,3 +37,35 @@ class AuthRepository:
 
             if connection and connection.is_connected():
                 connection.close()
+
+    @staticmethod
+    def find_by_id(profesor_id: int):
+        connection = None
+        cursor = None
+
+        try:
+            connection = get_connection()
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(
+                """
+                SELECT
+                    id,
+                    nombre,
+                    apellido,
+                    email,
+                    activo
+                FROM profesor
+                WHERE id = %s
+                LIMIT 1
+                """,
+                (profesor_id,)
+            )
+
+            return cursor.fetchone()
+
+        finally:
+            if cursor:
+                cursor.close()
+
+            if connection and connection.is_connected():
+                connection.close()
