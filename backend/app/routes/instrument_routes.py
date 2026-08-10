@@ -22,12 +22,6 @@ def get_by_id(instrument_id):
 
     instrumento = InstrumentService.get_by_id(instrument_id)
 
-    if instrumento is None:
-        return {
-            "success": False,
-            "message": "Instrumento no encontrado."
-        }, 404
-
     return {
         "success": True,
         "data": instrumento
@@ -37,24 +31,17 @@ def get_by_id(instrument_id):
 @jwt_required()
 def create():
 
-    data = request.get_json()
+    data = request.get_json() or {}
 
-    try:
-        instrumento = InstrumentService.create(
-            data.get("nombre", "")
-        )
+    instrumento = InstrumentService.create(
+        data.get("nombre", "")
+    )
 
-        return {
-            "success": True,
-            "message": "Instrumento creado correctamente.",
-            "data": instrumento
-        }, 201
-
-    except ValueError as e:
-        return {
-            "success": False,
-            "message": str(e)
-        }, 400
+    return {
+        "success": True,
+        "message": "Instrumento creado correctamente.",
+        "data": instrumento
+    }, 201
 
 @instrument_bp.put("/instrumentos/<int:instrument_id>")
 @jwt_required()
@@ -62,39 +49,24 @@ def update(instrument_id):
 
     data = request.get_json() or {}
 
-    try:
-        instrumento = InstrumentService.update(
-            instrument_id,
-            data.get("nombre", "")
-        )
+    instrumento = InstrumentService.update(
+        instrument_id,
+        data.get("nombre", "")
+    )
 
-        return {
-            "success": True,
-            "message": "Instrumento actualizado correctamente.",
-            "data": instrumento
-        }
-
-    except ValueError as e:
-        return {
-            "success": False,
-            "message": str(e)
-        }, 400
+    return {
+        "success": True,
+        "message": "Instrumento actualizado correctamente.",
+        "data": instrumento
+    }
 
 @instrument_bp.patch("/instrumentos/<int:instrument_id>/desactivar")
 @jwt_required()
 def deactivate(instrument_id):
 
-    try:
-        InstrumentService.deactivate(instrument_id)
+    InstrumentService.deactivate(instrument_id)
 
-        return {
-            "success": True,
-            "message": "Instrumento desactivado correctamente."
-        }
-
-    except ValueError as e:
-
-        return {
-            "success": False,
-            "message": str(e)
-        }, 400
+    return {
+        "success": True,
+        "message": "Instrumento desactivado correctamente."
+    }

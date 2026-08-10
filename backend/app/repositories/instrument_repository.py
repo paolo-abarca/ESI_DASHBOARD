@@ -7,120 +7,67 @@ class InstrumentRepository:
     def get_all():
 
         return BaseRepository.execute_query(
-                """
-                SELECT
-                    id,
-                    nombre,
-                    activo,
-                    created_at,
-                    updated_at
-                FROM instrumento
-                WHERE activo = TRUE
-                ORDER BY nombre ASC
-                """,
-                fetchall=True
-            )
+            """
+            SELECT
+                id,
+                nombre,
+                activo,
+                created_at,
+                updated_at
+            FROM instrumento
+            WHERE activo = TRUE
+            ORDER BY nombre ASC
+            """,
+            fetchall=True
+        )
 
     @staticmethod
     def get_by_id(instrument_id: int):
 
-        connection = None
-        cursor = None
-
-        try:
-            connection = get_connection()
-            cursor = connection.cursor(dictionary=True)
-            cursor.execute(
-                """
-                SELECT
-                    id,
-                    nombre,
-                    activo,
-                    created_at,
-                    updated_at
-                FROM instrumento
-                WHERE id = %s
-                AND activo = TRUE
-                LIMIT 1
-                """,
-                (instrument_id,)
-            )
-
-            return cursor.fetchone()
-
-        except Error:
-            raise
-
-        finally:
-            if cursor:
-                cursor.close()
-
-            if connection and connection.is_connected():
-                connection.close()
+        return BaseRepository.execute_query(
+            """
+            SELECT
+                id,
+                nombre,
+                activo,
+                created_at,
+                updated_at
+            FROM instrumento
+            WHERE id = %s
+            AND activo = TRUE
+            LIMIT 1
+            """,
+            (instrument_id,),
+            fetchone=True
+        )
 
     @staticmethod
     def exists_by_name(nombre: str):
 
-        connection = None
-        cursor = None
+        result = BaseRepository.execute_query(
+            """
+            SELECT id
+            FROM instrumento
+            WHERE nombre = %s
+            AND activo = TRUE
+            LIMIT 1
+            """,
+            (nombre,),
+            fetchone=True
+        )
 
-        try:
-            connection = get_connection()
-            cursor = connection.cursor(dictionary=True)
-            cursor.execute(
-                """
-                SELECT id
-                FROM instrumento
-                WHERE nombre = %s
-                AND activo = TRUE
-                LIMIT 1
-                """,
-                (nombre,)
-            )
-
-            return cursor.fetchone() is not None
-
-        except Error:
-            raise
-
-        finally:
-            if cursor:
-                cursor.close()
-
-            if connection and connection.is_connected():
-                connection.close()
+        return result is not None
 
     @staticmethod
     def create(nombre: str):
 
-        connection = None
-        cursor = None
-
-        try:
-            connection = get_connection()
-            cursor = connection.cursor(dictionary=True)
-            cursor.execute(
-                """
-                INSERT INTO instrumento(nombre)
-                VALUES (%s)
-                """,
-                (nombre,)
-            )
-
-            connection.commit()
-
-            return cursor.lastrowid
-        
-        except Error:
-            connection.rollback()
-            raise
-
-        finally:
-            if cursor:
-                cursor.close()
-
-            if connection and connection.is_connected():
-                connection.close()
+        return BaseRepository.execute_query(
+            """
+            INSERT INTO instrumento(nombre)
+            VALUES (%s)
+            """,
+            (nombre,)
+        )
 
     @staticmethod
     def update(instrument_id: int, nombre: str):
@@ -144,11 +91,6 @@ class InstrumentRepository:
             connection.commit()
 
             return cursor.rowcount > 0
-        
-        except Error:
-            if connection:
-                connection.rollback()
-            raise
 
         finally:
             if cursor:
@@ -179,11 +121,6 @@ class InstrumentRepository:
             connection.commit()
 
             return cursor.rowcount > 0
-        
-        except Error:
-            if connection:
-                connection.rollback()
-            raise
 
         finally:
             if cursor:

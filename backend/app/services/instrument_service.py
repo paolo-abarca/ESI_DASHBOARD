@@ -1,4 +1,6 @@
 from app.repositories.instrument_repository import InstrumentRepository
+from app.exceptions.not_found import NotFoundError
+from app.exceptions.validation import ValidationError
 
 class InstrumentService:
     @staticmethod
@@ -17,7 +19,9 @@ class InstrumentService:
         instrumento = InstrumentRepository.get_by_id(instrument_id)
 
         if instrumento is None:
-            return None
+            raise NotFoundError(
+                "Instrumento no encontrado."
+            )
 
         instrumento["activo"] = bool(instrumento["activo"])
 
@@ -28,10 +32,10 @@ class InstrumentService:
         nombre = nombre.strip()
 
         if not nombre:
-            raise ValueError("El nombre es obligatorio.")
+            raise ValidationError("El nombre es obligatorio.")
 
         if InstrumentRepository.exists_by_name(nombre):
-            raise ValueError("Ya existe un instrumento con ese nombre.")
+            raise ValidationError("Ya existe un instrumento con ese nombre.")
 
         instrumento_id = InstrumentRepository.create(nombre)
 
@@ -43,16 +47,16 @@ class InstrumentService:
         nombre = nombre.strip()
 
         if not nombre:
-            raise ValueError("El nombre es obligatorio.")
+            raise ValidationError("El nombre es obligatorio.")
 
         instrumento = InstrumentRepository.get_by_id(instrument_id)
 
         if instrumento is None:
-            raise ValueError("Instrumento no encontrado.")
+            raise ValidationError("Instrumento no encontrado.")
 
         if InstrumentRepository.exists_by_name(nombre):
             if instrumento["nombre"].lower() != nombre.lower():
-                raise ValueError(
+                raise ValidationError(
                     "Ya existe un instrumento con ese nombre."
                 )
 
@@ -62,7 +66,7 @@ class InstrumentService:
         )
 
         if not actualizado:
-            raise ValueError("No se pudo actualizar el instrumento.")
+            raise ValidationError("No se pudo actualizar el instrumento.")
         
         return InstrumentRepository.get_by_id(instrument_id)
 
@@ -72,11 +76,11 @@ class InstrumentService:
         instrumento = InstrumentRepository.get_by_id(instrument_id)
 
         if instrumento is None:
-            raise ValueError("Instrumento no encontrado.")
+            raise ValidationError("Instrumento no encontrado.")
 
         desactivado = InstrumentRepository.deactivate(instrument_id)
 
         if not desactivado:
-            raise ValueError("No se pudo desactivar el instrumento.")
+            raise ValidationError("No se pudo desactivar el instrumento.")
 
         return True

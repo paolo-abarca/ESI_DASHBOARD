@@ -4,6 +4,7 @@ from app.extensions import cors, jwt
 from app.routes.health_routes import health_bp
 from app.routes.auth_routes import auth_bp
 from app.routes.instrument_routes import instrument_bp
+from app.error_handlers import register_error_handlers
 
 def create_app():
     app = Flask(__name__)
@@ -11,6 +12,8 @@ def create_app():
 
     cors.init_app(app)
     jwt.init_app(app)
+
+    register_error_handlers(app)
 
     app.register_blueprint(health_bp)
     app.register_blueprint(auth_bp)
