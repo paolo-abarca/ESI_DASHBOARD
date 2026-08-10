@@ -1,17 +1,12 @@
 from mysql.connector import Error
 from app.config.database import get_connection
+from app.repositories.base_repository import BaseRepository
 
 class InstrumentRepository:
     @staticmethod
     def get_all():
 
-        connection = None
-        cursor = None
-
-        try:
-            connection = get_connection()
-            cursor = connection.cursor(dictionary=True)
-            cursor.execute(
+        return BaseRepository.execute_query(
                 """
                 SELECT
                     id,
@@ -22,20 +17,9 @@ class InstrumentRepository:
                 FROM instrumento
                 WHERE activo = TRUE
                 ORDER BY nombre ASC
-                """
+                """,
+                fetchall=True
             )
-
-            return cursor.fetchall()
-
-        except Error:
-            raise
-
-        finally:
-            if cursor:
-                cursor.close()
-
-            if connection and connection.is_connected():
-                connection.close()
 
     @staticmethod
     def get_by_id(instrument_id: int):
@@ -88,6 +72,7 @@ class InstrumentRepository:
                 SELECT id
                 FROM instrumento
                 WHERE nombre = %s
+                AND activo = TRUE
                 LIMIT 1
                 """,
                 (nombre,)
@@ -128,6 +113,76 @@ class InstrumentRepository:
         
         except Error:
             connection.rollback()
+            raise
+
+        finally:
+            if cursor:
+                cursor.close()
+
+            if connection and connection.is_connected():
+                connection.close()
+
+    @staticmethod
+    def update(instrument_id: int, nombre: str):
+
+        connection = None
+        cursor = None
+
+        try:
+            connection = get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                """
+                UPDATE instrumento
+                SET nombre = %s
+                WHERE id = %s
+                AND activo = TRUE
+                """,
+                (nombre, instrument_id)
+            )
+
+            connection.commit()
+
+            return cursor.rowcount > 0
+        
+        except Error:
+            if connection:
+                connection.rollback()
+            raise
+
+        finally:
+            if cursor:
+                cursor.close()
+
+            if connection and connection.is_connected():
+                connection.close()
+
+    @staticmethod
+    def deactivate(instrument_id: int):
+
+        connection = None
+        cursor = None
+
+        try:
+            connection = get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                """
+                UPDATE instrumento
+                SET activo = FALSE
+                WHERE id = %s
+                AND activo = TRUE
+                """,
+                (instrument_id,)
+            )
+
+            connection.commit()
+
+            return cursor.rowcount > 0
+        
+        except Error:
+            if connection:
+                connection.rollback()
             raise
 
         finally:

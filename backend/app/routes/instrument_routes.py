@@ -55,3 +55,46 @@ def create():
             "success": False,
             "message": str(e)
         }, 400
+
+@instrument_bp.put("/instrumentos/<int:instrument_id>")
+@jwt_required()
+def update(instrument_id):
+
+    data = request.get_json() or {}
+
+    try:
+        instrumento = InstrumentService.update(
+            instrument_id,
+            data.get("nombre", "")
+        )
+
+        return {
+            "success": True,
+            "message": "Instrumento actualizado correctamente.",
+            "data": instrumento
+        }
+
+    except ValueError as e:
+        return {
+            "success": False,
+            "message": str(e)
+        }, 400
+
+@instrument_bp.patch("/instrumentos/<int:instrument_id>/desactivar")
+@jwt_required()
+def deactivate(instrument_id):
+
+    try:
+        InstrumentService.deactivate(instrument_id)
+
+        return {
+            "success": True,
+            "message": "Instrumento desactivado correctamente."
+        }
+
+    except ValueError as e:
+
+        return {
+            "success": False,
+            "message": str(e)
+        }, 400
