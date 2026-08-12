@@ -5,6 +5,7 @@ from app.routes.health_routes import health_bp
 from app.routes.auth_routes import auth_bp
 from app.routes.instrument_routes import instrument_bp
 from app.error_handlers import register_error_handlers
+from app.routes.iglesia_routes import iglesia_bp
 
 def create_app():
     app = Flask(__name__)
@@ -18,6 +19,7 @@ def create_app():
     app.register_blueprint(health_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(instrument_bp)
+    app.register_blueprint(iglesia_bp)
 
     @app.get("/")
     def home():
