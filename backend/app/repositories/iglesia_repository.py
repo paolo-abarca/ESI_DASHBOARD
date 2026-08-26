@@ -99,43 +99,25 @@ class IglesiaRepository:
         telefono: str | None
     ):
 
-        connection = None
-        cursor = None
-
-        try:
-            connection = get_connection()
-            cursor = connection.cursor()
-
-            cursor.execute(
-                """
-                UPDATE iglesia
-                SET
-                    nombre = %s,
-                    direccion = %s,
-                    contacto = %s,
-                    telefono = %s
-                WHERE id = %s
-                AND activo = TRUE
-                """,
-                (
-                    nombre,
-                    direccion,
-                    contacto,
-                    telefono,
-                    iglesia_id
-                )
+        return BaseRepository.execute_update(
+            """
+            UPDATE iglesia
+            SET
+                nombre = %s,
+                direccion = %s,
+                contacto = %s,
+                telefono = %s
+            WHERE id = %s
+            AND activo = TRUE
+            """,
+            (
+                nombre,
+                direccion,
+                contacto,
+                telefono,
+                iglesia_id
             )
-
-            connection.commit()
-
-            return cursor.rowcount > 0
-
-        finally:
-            if cursor:
-                cursor.close()
-
-            if connection and connection.is_connected():
-                connection.close()
+        )
 
     @staticmethod
     def get_by_name(nombre: str):
@@ -157,30 +139,12 @@ class IglesiaRepository:
     @staticmethod
     def deactivate(iglesia_id: int):
 
-        connection = None
-        cursor = None
-
-        try:
-            connection = get_connection()
-            cursor = connection.cursor()
-
-            cursor.execute(
-                """
-                UPDATE iglesia
-                SET activo = False
-                WHERE id = %s
-                AND activo = True
-                """,
-                (iglesia_id,)
-            )
-
-            connection.commit()
-
-            return cursor.rowcount > 0
-
-        finally:
-            if cursor:
-                cursor.close()
-
-            if connection and connection.is_connected():
-                connection.close()
+        return BaseRepository.execute_update(
+            """
+            UPDATE iglesia
+            SET activo = False
+            WHERE id = %s
+            AND activo = True
+            """,
+            (iglesia_id,)
+        )

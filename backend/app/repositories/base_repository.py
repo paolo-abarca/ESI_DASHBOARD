@@ -29,3 +29,25 @@ class BaseRepository:
 
             if connection and connection.is_connected():
                 connection.close()
+
+    @staticmethod
+    def execute_update(query, params=None):
+
+        connection = None
+        cursor = None
+
+        try:
+            connection = get_connection()
+            cursor = connection.cursor(dictionary=True)
+
+            cursor.execute(query, params or ())
+            connection.commit()
+
+            return cursor.rowcount
+
+        finally:
+            if cursor:
+                cursor.close()
+
+            if connection and connection.is_connected():
+                connection.close()

@@ -72,59 +72,25 @@ class InstrumentRepository:
     @staticmethod
     def update(instrument_id: int, nombre: str):
 
-        connection = None
-        cursor = None
-
-        try:
-            connection = get_connection()
-            cursor = connection.cursor()
-            cursor.execute(
-                """
-                UPDATE instrumento
-                SET nombre = %s
-                WHERE id = %s
-                AND activo = TRUE
-                """,
-                (nombre, instrument_id)
-            )
-
-            connection.commit()
-
-            return cursor.rowcount > 0
-
-        finally:
-            if cursor:
-                cursor.close()
-
-            if connection and connection.is_connected():
-                connection.close()
+        return BaseRepository.execute_update(
+            """
+            UPDATE instrumento
+            SET nombre = %s
+            WHERE id = %s
+            AND activo = TRUE
+            """,
+            (nombre, instrument_id)
+        )
 
     @staticmethod
     def deactivate(instrument_id: int):
 
-        connection = None
-        cursor = None
-
-        try:
-            connection = get_connection()
-            cursor = connection.cursor()
-            cursor.execute(
-                """
-                UPDATE instrumento
-                SET activo = FALSE
-                WHERE id = %s
-                AND activo = TRUE
-                """,
-                (instrument_id,)
-            )
-
-            connection.commit()
-
-            return cursor.rowcount > 0
-
-        finally:
-            if cursor:
-                cursor.close()
-
-            if connection and connection.is_connected():
-                connection.close()
+        return BaseRepository.execute_update(
+            """
+            UPDATE instrumento
+            SET activo = FALSE
+            WHERE id = %s
+            AND activo = TRUE
+            """,
+            (instrument_id,)
+        )
