@@ -2,6 +2,12 @@ from flask import Blueprint
 from flask_jwt_extended import jwt_required
 from app.services.profesor_service import ProfesorService
 from flask import Blueprint, request
+from app.services.profesor_iglesia_service import (
+    ProfesorIglesiaService
+)
+from app.services.profesor_instrumento_service import (
+    ProfesorInstrumentoService
+)
 
 profesor_bp = Blueprint("profesores", __name__)
 
@@ -79,4 +85,103 @@ def deactivate(profesor_id):
     return {
         "success": True,
         "message": "Profesor desactivado correctamente."
+    }
+
+@profesor_bp.post(
+    "/profesores/<int:profesor_id>/iglesias/<int:iglesia_id>"
+)
+@jwt_required()
+def assign_iglesia(profesor_id, iglesia_id):
+
+    relacion = ProfesorIglesiaService.assign(
+        profesor_id,
+        iglesia_id
+    )
+
+    return {
+        "success": True,
+        "message": "Iglesia asignada al profesor correctamente.",
+        "data": relacion
+    }, 201
+
+@profesor_bp.get(
+    "/profesores/<int:profesor_id>/iglesias"
+)
+@jwt_required()
+def get_iglesias(profesor_id):
+
+    iglesias = ProfesorIglesiaService.get_iglesias(
+        profesor_id
+    )
+
+    return {
+        "success": True,
+        "data": iglesias
+    }
+
+@profesor_bp.patch(
+    "/profesores/<int:profesor_id>/iglesias/<int:iglesia_id>/desactivar"
+)
+@jwt_required()
+def deactivate_iglesia(profesor_id, iglesia_id):
+
+    ProfesorIglesiaService.deactivate(
+        profesor_id,
+        iglesia_id
+    )
+
+    return {
+        "success": True,
+        "message": "Asociación desactivada correctamente."
+    }
+
+@profesor_bp.post(
+    "/profesores/<int:profesor_id>/instrumentos/<int:instrumento_id>"
+)
+@jwt_required()
+def assign_instrumento(profesor_id, instrumento_id):
+
+    relacion = ProfesorInstrumentoService.assign(
+        profesor_id,
+        instrumento_id
+    )
+
+    return {
+        "success": True,
+        "message": "Instrumento asignado al profesor correctamente.",
+        "data": relacion
+    }, 201
+
+@profesor_bp.get(
+    "/profesores/<int:profesor_id>/instrumentos"
+)
+@jwt_required()
+def get_instrumentos(profesor_id):
+
+    instrumentos = ProfesorInstrumentoService.get_instrumentos(
+        profesor_id
+    )
+
+    return {
+        "succcess": True,
+        "data": instrumentos
+    }
+
+@profesor_bp.patch(
+    "/profesores/<int:profesor_id>/instrumentos/<int:instrumento_id>/desactivar"
+)
+@jwt_required()
+def deactivate_instrumento(
+    profesor_id,
+    instrumento_id
+):
+
+    ProfesorInstrumentoService.deactivate(
+        profesor_id,
+        instrumento_id
+    )
+
+    return {
+        "success": True,
+        "message": "Asociación con el instrumento desactivada correctamente."
     }
