@@ -7,6 +7,11 @@ from app.routes.instrument_routes import instrument_bp
 from app.error_handlers import register_error_handlers
 from app.routes.iglesia_routes import iglesia_bp
 from app.routes.profesor_routes import profesor_bp
+from app.routes.alumno_routes import alumno_bp
+from app.routes.inscripcion_routes import (
+    inscripcion_bp
+)
+from app.routes.clase_routes import clase_bp
 
 def create_app():
     app = Flask(__name__)
@@ -22,6 +27,9 @@ def create_app():
     app.register_blueprint(instrument_bp)
     app.register_blueprint(iglesia_bp)
     app.register_blueprint(profesor_bp)
+    app.register_blueprint(alumno_bp)
+    app.register_blueprint(inscripcion_bp)
+    app.register_blueprint(clase_bp)
 
     @app.get("/")
     def home():

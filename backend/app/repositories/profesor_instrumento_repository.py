@@ -111,3 +111,24 @@ class ProfesorInstrumentoRepository:
                 instrumento_id
             )
         )
+
+    @staticmethod
+    def get_by_id(profesor_instrumento_id: int):
+
+        return BaseRepository.execute_query(
+            """
+            SELECT
+                id,
+                profesor_id,
+                instrumento_id,
+                activo,
+                created_at,
+                updated_at
+            FROM profesor_instrumento
+            WHERE id = %s
+            AND activo = TRUE
+            LIMIT 1
+            """,
+            (profesor_instrumento_id,),
+            fetchone=True
+        )
