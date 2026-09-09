@@ -40,3 +40,31 @@ def create_clase():
     )
 
     return jsonify(clase), 201
+
+@clase_bp.put("/<int:clase_id>")
+def update_clase(clase_id):
+
+    data = request.get_json()
+
+    if not data:
+        return jsonify({
+            "error": "El body es obligatorio."
+        }), 400
+
+    clase = ClaseService.update(
+        clase_id,
+        data
+    )
+
+    return jsonify(clase), 200
+
+@clase_bp.patch(
+    "/<int:clase_id>/desactivar"
+)
+def deactivate_clase(clase_id):
+
+    result = ClaseService.deactivate(
+        clase_id
+    )
+
+    return jsonify(result), 200
