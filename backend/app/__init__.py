@@ -14,6 +14,7 @@ from app.routes.inscripcion_routes import (
 from app.routes.clase_routes import clase_bp
 from app.routes.asistencia_routes import asistencia_bp
 from app.routes.calificacion_routes import calificacion_bp
+from app.routes.tarea_routes import tarea_bp
 
 def create_app():
     app = Flask(__name__)
@@ -34,6 +35,7 @@ def create_app():
     app.register_blueprint(clase_bp)
     app.register_blueprint(asistencia_bp)
     app.register_blueprint(calificacion_bp)
+    app.register_blueprint(tarea_bp)
 
     @app.get("/")
     def home():

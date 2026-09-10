@@ -8,6 +8,7 @@ from app.services.profesor_iglesia_service import (
 from app.services.profesor_instrumento_service import (
     ProfesorInstrumentoService
 )
+from app.utils.permissions import own_profesor_required
 
 profesor_bp = Blueprint("profesores", __name__)
 
@@ -56,6 +57,7 @@ def create():
 
 @profesor_bp.put("/profesores/<int:profesor_id>")
 @jwt_required()
+@own_profesor_required
 def update(profesor_id):
 
     data = request.get_json() or {}
@@ -78,6 +80,7 @@ def update(profesor_id):
 
 @profesor_bp.patch("/profesores/<int:profesor_id>/desactivar")
 @jwt_required()
+@own_profesor_required
 def deactivate(profesor_id):
 
     ProfesorService.deactivate(profesor_id)
