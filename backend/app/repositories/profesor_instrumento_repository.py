@@ -132,3 +132,23 @@ class ProfesorInstrumentoRepository:
             (profesor_instrumento_id,),
             fetchone=True
         )
+
+    @staticmethod
+    def belongs_to_profesor(
+        profesor_instrumento_id: int,
+        profesor_id: int
+    ):
+        result = BaseRepository.execute_query(
+            """
+            SELECT 1
+            FROM profesor_instrumento
+            WHERE id = %s
+            AND profesor_id = %s
+            AND activo = TRUE
+            LIMIT 1
+            """,
+            (profesor_instrumento_id, profesor_id),
+            fetchone=True
+        )
+
+        return result is not None

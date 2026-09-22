@@ -6,6 +6,8 @@ from app.repositories.profesor_instrumento_repository import (
     ProfesorInstrumentoRepository
 )
 from app.repositories.inscripcion_repository import InscripcionRepository
+from app.exceptions.forbidden import ForbiddenError
+from app.utils.auth_utils import get_current_profesor_id
 
 class InscripcionService:
 
@@ -67,6 +69,16 @@ class InscripcionService:
         if not profesor_instrumento:
             raise NotFoundError(
                 "La relación profesor-instrumento no existe."
+            )
+
+        profesor_id = get_current_profesor_id()
+
+        if not ProfesorInstrumentoRepository.belongs_to_profesor(
+            profesor_instrumento_id,
+            profesor_id
+        ):
+            raise ForbiddenError(
+                "No tienes permiso para crear una inscripción con este profesor-instrumento."
             )
 
         try:
@@ -140,6 +152,16 @@ class InscripcionService:
                 "Inscripción no encontrada."
             )
 
+        profesor_id = get_current_profesor_id()
+
+        if not InscripcionRepository.belongs_to_profesor(
+            inscripcion_id,
+            profesor_id
+        ):
+            raise ForbiddenError(
+                "No tienes permiso para modificar esta inscripción."
+            )
+
         fecha_inicio = data.get("fecha_inicio")
         fecha_fin = data.get("fecha_fin")
         observaciones = data.get("observaciones")
@@ -190,7 +212,7 @@ class InscripcionService:
         )
 
     @staticmethod
-    def deactivate(inscripcion_id):
+    def deactivate(inscripcion_id: int):
 
         inscripcion = InscripcionRepository.get_by_id(
             inscripcion_id
@@ -199,6 +221,16 @@ class InscripcionService:
         if not inscripcion:
             raise NotFoundError(
                 "Inscripción no encontrada."
+            )
+
+        profesor_id = get_current_profesor_id()
+
+        if not InscripcionRepository.belongs_to_profesor(
+            inscripcion_id,
+            profesor_id
+        ):
+            raise ForbiddenError(
+                "No tienes permiso para modificar esta inscripción."
             )
 
         InscripcionRepository.deactivate(

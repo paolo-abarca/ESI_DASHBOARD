@@ -94,6 +94,7 @@ def deactivate(profesor_id):
     "/profesores/<int:profesor_id>/iglesias/<int:iglesia_id>"
 )
 @jwt_required()
+@own_profesor_required
 def assign_iglesia(profesor_id, iglesia_id):
 
     relacion = ProfesorIglesiaService.assign(
@@ -126,6 +127,7 @@ def get_iglesias(profesor_id):
     "/profesores/<int:profesor_id>/iglesias/<int:iglesia_id>/desactivar"
 )
 @jwt_required()
+@own_profesor_required
 def deactivate_iglesia(profesor_id, iglesia_id):
 
     ProfesorIglesiaService.deactivate(
@@ -142,6 +144,7 @@ def deactivate_iglesia(profesor_id, iglesia_id):
     "/profesores/<int:profesor_id>/instrumentos/<int:instrumento_id>"
 )
 @jwt_required()
+@own_profesor_required
 def assign_instrumento(profesor_id, instrumento_id):
 
     relacion = ProfesorInstrumentoService.assign(
@@ -166,7 +169,7 @@ def get_instrumentos(profesor_id):
     )
 
     return {
-        "succcess": True,
+        "success": True,
         "data": instrumentos
     }
 
@@ -174,6 +177,7 @@ def get_instrumentos(profesor_id):
     "/profesores/<int:profesor_id>/instrumentos/<int:instrumento_id>/desactivar"
 )
 @jwt_required()
+@own_profesor_required
 def deactivate_instrumento(
     profesor_id,
     instrumento_id

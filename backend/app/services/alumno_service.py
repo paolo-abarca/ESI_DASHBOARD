@@ -3,6 +3,9 @@ from app.exceptions.not_found import NotFoundError
 from app.exceptions.validation import ValidationError
 from app.repositories.alumno_repository import AlumnoRepository
 from app.repositories.iglesia_repository import IglesiaRepository
+from flask_jwt_extended import get_jwt_identity
+from app.exceptions.forbidden import ForbiddenError
+from app.utils.auth_utils import get_current_profesor_id
 
 class AlumnoService:
 
@@ -123,6 +126,16 @@ class AlumnoService:
                 "Alumno no encontrado."
             )
 
+        profesor_id = get_current_profesor_id()
+
+        if not AlumnoRepository.belongs_to_profesor(
+            alumno_id,
+            profesor_id
+        ):
+            raise ForbiddenError(
+                "No tienes permiso para modificar este alumno."
+            )
+
         if not nombre or not nombre.strip():
             raise ValidationError(
                 "El nombre del alumno es obligatorio."
@@ -200,6 +213,16 @@ class AlumnoService:
         if alumno is None:
             raise NotFoundError(
                 "Alumno no encontrado."
+            )
+
+        profesor_id = get_current_profesor_id()
+
+        if not AlumnoRepository.belongs_to_profesor(
+            alumno_id,
+            profesor_id
+        ):
+            raise ForbiddenError(
+                "No tienes permiso para modificar este alumno."
             )
 
         updated = AlumnoRepository.deactivate(

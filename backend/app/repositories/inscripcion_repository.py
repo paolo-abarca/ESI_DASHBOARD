@@ -229,3 +229,26 @@ class InscripcionRepository:
                 inscripcion_id
             )
         )
+
+    @staticmethod
+    def belongs_to_profesor(
+        inscripcion_id: int,
+        profesor_id: int
+    ):
+        result = BaseRepository.execute_query(
+            """
+            SELECT 1
+            FROM inscripcion i
+            INNER JOIN profesor_instrumento pi
+            ON pi.id = i.profesor_instrumento_id
+            WHERE i.id = %s
+            AND pi.profesor_id = %s
+            AND i.activo = TRUE
+            AND pi.activo = TRUE
+            LIMIT 1
+            """,
+            (inscripcion_id, profesor_id),
+            fetchone=True
+        )
+
+        return result is not None
