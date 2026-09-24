@@ -7,6 +7,8 @@ from app.repositories.inscripcion_repository import (
 from app.repositories.clase_repository import (
     ClaseRepository
 )
+from app.exceptions.forbidden import ForbiddenError
+from app.utils.auth_utils import get_current_profesor_id
 
 class ClaseService:
 
@@ -80,6 +82,16 @@ class ClaseService:
                 "Inscripción no encontrada."
             )
 
+        profesor_id = get_current_profesor_id()
+
+        if not InscripcionRepository.belongs_to_profesor(
+            inscripcion_id,
+            profesor_id
+        ):
+            raise ForbiddenError(
+                "No tienes permiso para crear una clase en esta inscripción."
+            )
+
         try:
             fecha_obj = date.fromisoformat(
                 fecha
@@ -133,6 +145,16 @@ class ClaseService:
         if not clase:
             raise NotFoundError(
                 "Clase no encontrada."
+            )
+
+        profesor_id = get_current_profesor_id()
+
+        if not ClaseRepository.belongs_to_profesor(
+            clase_id,
+            profesor_id
+        ):
+            raise ForbiddenError(
+                "No tienes permiso para modificar esta clase."
             )
 
         fecha = data.get("fecha")
@@ -210,6 +232,16 @@ class ClaseService:
         if not clase:
             raise NotFoundError(
                 "Clase no encontrada."
+            )
+
+        profesor_id = get_current_profesor_id()
+
+        if not ClaseRepository.belongs_to_profesor(
+            clase_id,
+            profesor_id
+        ):
+            raise ForbiddenError(
+                "No tienes permiso para modificar esta clase."
             )
 
         ClaseRepository.deactivate(

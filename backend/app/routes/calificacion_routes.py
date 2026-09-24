@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from app.services.calificacion_service import CalificacionService
+from flask_jwt_extended import jwt_required
 
 calificacion_bp = Blueprint(
     "calificacion",
@@ -8,11 +9,13 @@ calificacion_bp = Blueprint(
 )
 
 @calificacion_bp.get("")
+@jwt_required()
 def get_calificaciones():
     calificaciones = CalificacionService.get_all()
     return jsonify(calificaciones), 200
 
 @calificacion_bp.get("/<int:calificacion_id>")
+@jwt_required()
 def get_calificacion(calificacion_id):
     calificacion = CalificacionService.get_by_id(
         calificacion_id
@@ -20,6 +23,7 @@ def get_calificacion(calificacion_id):
     return jsonify(calificacion), 200
 
 @calificacion_bp.post("")
+@jwt_required()
 def create_calificacion():
     data = request.get_json()
 
@@ -33,6 +37,7 @@ def create_calificacion():
     return jsonify(calificacion), 201
 
 @calificacion_bp.put("/<int:calificacion_id>")
+@jwt_required()
 def update_calificacion(calificacion_id):
     data = request.get_json()
 

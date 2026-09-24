@@ -3,6 +3,8 @@ from app.exceptions.not_found import NotFoundError
 from app.exceptions.validation import ValidationError
 from app.repositories.clase_repository import ClaseRepository
 from app.repositories.tarea_repository import TareaRepository
+from app.exceptions.forbidden import ForbiddenError
+from app.utils.auth_utils import get_current_profesor_id
 
 class TareaService:
 
@@ -72,7 +74,17 @@ class TareaService:
         clase = ClaseRepository.get_by_id(clase_id)
 
         if not clase:
-            raise NotFoundError("Clase no encontrada")
+            raise NotFoundError("Clase no encontrada.")
+
+        profesor_id = get_current_profesor_id()
+        
+        if not ClaseRepository.belongs_to_profesor(
+            clase_id,
+            profesor_id
+        ):
+            raise ForbiddenError(
+                "No tienes permiso para crear una tarea en esta clase."
+            )
 
         fecha_entrega_obj = TareaService._parse_fecha_entrega(
             fecha_entrega
@@ -94,7 +106,17 @@ class TareaService:
         tarea = TareaRepository.get_by_id(tarea_id)
 
         if not tarea:
-            raise NotFoundError("Tarea no encontrada")
+            raise NotFoundError("Tarea no encontrada.")
+
+        profesor_id = get_current_profesor_id()
+
+        if not TareaRepository.belongs_to_profesor(
+            tarea_id,
+            profesor_id
+        ):
+            raise ForbiddenError(
+                "No tienes permiso para modificar esta tarea."
+            )
 
         titulo = data.get("titulo")
         descripcion = data.get("descripcion")
@@ -121,7 +143,17 @@ class TareaService:
         tarea = TareaRepository.get_by_id(tarea_id)
 
         if not tarea:
-            raise NotFoundError("Tarea no encontrada")
+            raise NotFoundError("Tarea no encontrada.")
+
+        profesor_id = get_current_profesor_id()
+
+        if not TareaRepository.belongs_to_profesor(
+            tarea_id,
+            profesor_id
+        ):
+            raise ForbiddenError(
+                "No tienes permiso para modificar esta tarea."
+            )
 
         estado = data.get("estado")
 

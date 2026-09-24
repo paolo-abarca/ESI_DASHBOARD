@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from app.services.asistencia_service import (
     AsistenciaService
 )
+from flask_jwt_extended import jwt_required
 
 asistencia_bp = Blueprint(
     "asistencia",
@@ -10,6 +11,7 @@ asistencia_bp = Blueprint(
 )
 
 @asistencia_bp.get("")
+@jwt_required()
 def get_asistencias():
 
     asistencias = (
@@ -19,6 +21,7 @@ def get_asistencias():
     return jsonify(asistencias), 200
 
 @asistencia_bp.get("/<int:asistencia_id>")
+@jwt_required()
 def get_asistencia(asistencia_id):
 
     asistencia = (
@@ -30,6 +33,7 @@ def get_asistencia(asistencia_id):
     return jsonify(asistencia), 200
 
 @asistencia_bp.post("")
+@jwt_required()
 def create_asistencia():
 
     data = request.get_json()
@@ -46,6 +50,7 @@ def create_asistencia():
     return jsonify(asistencia), 201
 
 @asistencia_bp.put("/<int:asistencia_id>")
+@jwt_required()
 def update_asistencia(asistencia_id):
 
     data = request.get_json()

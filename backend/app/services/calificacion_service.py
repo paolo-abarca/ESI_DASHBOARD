@@ -4,6 +4,8 @@ from app.exceptions.validation import ValidationError
 from app.repositories.clase_repository import ClaseRepository
 from app.repositories.inscripcion_repository import InscripcionRepository
 from app.repositories.calificacion_repository import CalificacionRepository
+from app.exceptions.forbidden import ForbiddenError
+from app.utils.auth_utils import get_current_profesor_id
 
 class CalificacionService:
 
@@ -83,6 +85,16 @@ class CalificacionService:
                 "La clase no pertenece a la inscripción."
             )
 
+        profesor_id = get_current_profesor_id()
+
+        if not ClaseRepository.belongs_to_profesor(
+            clase_id,
+            profesor_id
+        ):
+            raise ForbiddenError(
+                "No tienes permiso para crear una calificación en esta clase."
+            )
+
         existente = (
             CalificacionRepository.get_by_clase_inscripcion_tipo(
                 clase_id,
@@ -114,6 +126,16 @@ class CalificacionService:
 
         if not calificacion:
             raise NotFoundError("Calificación no encontrada.")
+
+        profesor_id = get_current_profesor_id()
+
+        if not CalificacionRepository.belongs_to_profesor(
+            calificacion_id,
+            profesor_id
+        ):
+            raise ForbiddenError(
+                "No tienes permiso para modificar esta calificación."
+            )
 
         tipo = data.get("tipo")
         nota = data.get("nota")

@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from app.services.clase_service import (
     ClaseService
 )
+from flask_jwt_extended import jwt_required
 
 clase_bp = Blueprint(
     "clase",
@@ -10,6 +11,7 @@ clase_bp = Blueprint(
 )
 
 @clase_bp.get("")
+@jwt_required()
 def get_clases():
 
     clases = ClaseService.get_all()
@@ -17,6 +19,7 @@ def get_clases():
     return jsonify(clases), 200
 
 @clase_bp.get("/<int:clase_id>")
+@jwt_required()
 def get_clase(clase_id):
 
     clase = ClaseService.get_by_id(
@@ -26,6 +29,7 @@ def get_clase(clase_id):
     return jsonify(clase), 200
 
 @clase_bp.post("")
+@jwt_required()
 def create_clase():
 
     data = request.get_json()
@@ -42,6 +46,7 @@ def create_clase():
     return jsonify(clase), 201
 
 @clase_bp.put("/<int:clase_id>")
+@jwt_required()
 def update_clase(clase_id):
 
     data = request.get_json()
@@ -61,6 +66,7 @@ def update_clase(clase_id):
 @clase_bp.patch(
     "/<int:clase_id>/desactivar"
 )
+@jwt_required()
 def deactivate_clase(clase_id):
 
     result = ClaseService.deactivate(

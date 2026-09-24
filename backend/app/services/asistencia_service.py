@@ -9,6 +9,8 @@ from app.repositories.inscripcion_repository import (
 from app.repositories.asistencia_repository import (
     AsistenciaRepository
 )
+from app.exceptions.forbidden import ForbiddenError
+from app.utils.auth_utils import get_current_profesor_id
 
 class AsistenciaService:
 
@@ -94,6 +96,16 @@ class AsistenciaService:
                 "La clase no pertenece a la inscripción."
             )
 
+        profesor_id = get_current_profesor_id()
+
+        if not ClaseRepository.belongs_to_profesor(
+            clase_id,
+            profesor_id
+        ):
+            raise ForbiddenError(
+                "No tienes permiso para registrar asistencia en esta clase."
+            )
+
         existente = (
             AsistenciaRepository
             .get_by_clase_and_inscripcion(
@@ -131,6 +143,16 @@ class AsistenciaService:
         if not asistencia:
             raise NotFoundError(
                 "Asistencia no encontrada."
+            )
+
+        profesor_id = get_current_profesor_id()
+
+        if not AsistenciaRepository.belongs_to_profesor(
+            asistencia_id,
+            profesor_id
+        ):
+            raise ForbiddenError(
+                "No tienes permiso para modificar esta asistencia."
             )
 
         estado = data.get("estado")

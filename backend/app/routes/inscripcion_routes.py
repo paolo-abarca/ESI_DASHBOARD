@@ -8,31 +8,8 @@ inscripcion_bp = Blueprint(
     url_prefix="/inscripciones"
 )
 
-@inscripcion_bp.get("/inscripciones")
-@jwt_required()
-def get_all():
-
-    inscripciones = InscripcionService.get_all()
-
-    return {
-        "success": True,
-        "data": inscripciones
-    }
-
-@inscripcion_bp.get("/inscripciones/<int:inscripcion_id>")
-@jwt_required()
-def get_by_id(inscripcion_id):
-
-    inscripcion = InscripcionService.get_by_id(
-        inscripcion_id
-    )
-
-    return {
-        "success": True,
-        "data": inscripcion
-    }
-
 @inscripcion_bp.get("")
+@jwt_required()
 def get_inscripciones():
 
     inscripciones = InscripcionService.get_all()
@@ -40,6 +17,7 @@ def get_inscripciones():
     return jsonify(inscripciones), 200
 
 @inscripcion_bp.get("/<int:inscripcion_id>")
+@jwt_required()
 def get_inscripcion(inscripcion_id):
 
     inscripcion = InscripcionService.get_by_id(
@@ -49,6 +27,7 @@ def get_inscripcion(inscripcion_id):
     return jsonify(inscripcion), 200
 
 @inscripcion_bp.post("")
+@jwt_required()
 def create_inscripcion():
 
     data = request.get_json()
@@ -63,6 +42,7 @@ def create_inscripcion():
     return jsonify(inscripcion), 201
 
 @inscripcion_bp.put("/<int:inscripcion_id>")
+@jwt_required()
 def update_inscripcion(inscripcion_id):
 
     data = request.get_json()
@@ -82,6 +62,7 @@ def update_inscripcion(inscripcion_id):
 @inscripcion_bp.patch(
     "/<int:inscripcion_id>/desactivar"
 )
+@jwt_required()
 def deactivate_inscripcion(inscripcion_id):
 
     result = InscripcionService.deactivate(
