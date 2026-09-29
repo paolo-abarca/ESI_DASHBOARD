@@ -9,7 +9,7 @@ export async function apiRequest(endpoint, options = {}) {
     }
 
     if (token) {
-        headers.Authorization = `Bearer $(token)`
+        headers.Authorization = `Bearer ${token}`
     }
 
     const response = await fetch(`${API_URL}${endpoint}`, {
@@ -20,7 +20,13 @@ export async function apiRequest(endpoint, options = {}) {
     const data = await response.json()
 
     if (!response.ok) {
-        throw new Error(data.message || 'Ocurrió un error en la solicitud')
+        console.error('ERROR API:', response.status, data)
+
+        throw new Error(
+            data.message ||
+            data.msg ||
+            'Ocurrió un error en la solicitud'
+        )
     }
 
     return data
