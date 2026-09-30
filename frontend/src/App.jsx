@@ -4,6 +4,10 @@ import Dashboard from './pages/Dashboard'
 import ProtectedRoute from './components/ProtectedRoute'
 import ProfesorPerfil from './pages/ProfesorPerfil'
 import ProfesorEditar from './pages/ProfesorEditar'
+import Alumnos from './pages/Alumnos'
+import AlumnoNuevo from './pages/AlumnoNuevo'
+import AlumnoPerfil from './pages/AlumnoPerfil'
+import AlumnoEditar from './pages/AlumnoEditar'
 
 function App() {
   return (
@@ -38,6 +42,42 @@ function App() {
           element={
             <ProtectedRoute>
               <ProfesorEditar />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/alumnos"
+          element={
+            <ProtectedRoute>
+              <Alumnos />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/alumnos/nuevo"
+          element={
+            <ProtectedRoute>
+              <AlumnoNuevo />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/alumnos/:alumnoId"
+          element={
+            <ProtectedRoute>
+              <AlumnoPerfil />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/alumnos/:alumnoId/editar"
+          element={
+            <ProtectedRoute>
+              <AlumnoEditar />
             </ProtectedRoute>
           }
         />
