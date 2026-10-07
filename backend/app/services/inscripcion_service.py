@@ -17,6 +17,16 @@ class InscripcionService:
         return InscripcionRepository.get_all()
 
     @staticmethod
+    def get_by_alumno(alumno_id):
+
+        alumno = AlumnoRepository.get_by_id(alumno_id)
+
+        if not alumno:
+            raise NotFoundError("Alumno no encontrado.")
+
+        return InscripcionRepository.get_by_alumno(alumno_id)
+
+    @staticmethod
     def get_by_id(inscripcion_id):
 
         inscripcion = InscripcionRepository.get_by_id(inscripcion_id)

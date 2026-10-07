@@ -16,6 +16,14 @@ def get_inscripciones():
 
     return jsonify(inscripciones), 200
 
+@inscripcion_bp.get("/alumno/<int:alumno_id>")
+@jwt_required()
+def get_inscripciones_by_alumno(alumno_id):
+
+    inscripciones = InscripcionService.get_by_alumno(alumno_id)
+
+    return jsonify(inscripciones), 200
+
 @inscripcion_bp.get("/<int:inscripcion_id>")
 @jwt_required()
 def get_inscripcion(inscripcion_id):

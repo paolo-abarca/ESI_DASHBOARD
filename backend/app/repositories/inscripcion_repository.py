@@ -37,6 +37,42 @@ class InscripcionRepository:
         )
 
     @staticmethod
+    def get_by_alumno(alumno_id):
+
+        return BaseRepository.execute_query(
+            """
+            SELECT
+                ins.id,
+                ins.alumno_id,
+                CONCAT(a.nombre, ' ', a.apellido) AS alumno_nombre,
+                ins.profesor_instrumento_id,
+                CONCAT(p.nombre, ' ', p.apellido) AS profesor_nombre,
+                i.nombre AS instrumento_nombre,
+                ins.tipo_clase,
+                ins.fecha_inicio,
+                ins.fecha_fin,
+                ins.observaciones,
+                ins.activo,
+                ins.created_at,
+                ins.updated_at
+            FROM inscripcion ins
+            INNER JOIN alumno a
+                ON a.id = ins.alumno_id
+            INNER JOIN profesor_instrumento pi
+                ON pi.id = ins.profesor_instrumento_id
+            INNER JOIN profesor p
+                ON p.id = pi.profesor_id
+            INNER JOIN instrumento i
+                ON i.id = pi.instrumento_id
+            WHERE ins.alumno_id = %s
+            AND ins.activo = TRUE
+            ORDER BY ins.fecha_inicio DESC, ins.id DESC
+            """,
+            (alumno_id,),
+            fetchall=True
+        )
+
+    @staticmethod
     def get_by_id(inscripcion_id):
 
         return BaseRepository.execute_query(
