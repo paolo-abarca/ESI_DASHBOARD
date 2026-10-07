@@ -211,6 +211,37 @@ function Dashboard() {
                             </div>
                         </button>
 
+                        <button
+                            onClick={() => navigate('/clases')}
+                            className="group rounded-2xl bg-white p-6 text-left shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+                        >
+                            <div className="flex items-center gap-4">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-2xl">
+                                    📚
+                                </div>
+
+                                <div>
+                                    <h4 className="mt-4 text-lg font-bold text-slate-900">
+                                        Clases
+                                    </h4>
+
+                                    <p className="mt-1 text-sm text-slate-500">
+                                        Gestionar clases y sesiones
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4">
+                                <span className="text-sm font-medium text-slate-500">
+                                    Ver clases
+                                </span>
+
+                                <span className="text-indigo-600 transition group-hover:translate-x-1">
+                                    →
+                                </span>
+                            </div>
+                        </button>
+
                     </div>
                 </section>
             </main>

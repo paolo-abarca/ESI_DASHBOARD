@@ -8,6 +8,10 @@ import Alumnos from './pages/Alumnos'
 import AlumnoNuevo from './pages/AlumnoNuevo'
 import AlumnoPerfil from './pages/AlumnoPerfil'
 import AlumnoEditar from './pages/AlumnoEditar'
+import AlumnoInscripcionNueva from './pages/AlumnoInscripcionNueva'
+import InscripcionEditar from './pages/InscripcionEditar'
+import Clases from './pages/Clases'
+import ClaseNueva from './pages/ClaseNueva'
 
 function App() {
   return (
@@ -78,6 +82,38 @@ function App() {
           element={
             <ProtectedRoute>
               <AlumnoEditar />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/alumnos/:alumnoId/inscripciones/nueva"
+          element={
+            <ProtectedRoute>
+              <AlumnoInscripcionNueva />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/inscripciones/:inscripcionId/editar"
+          element={
+            <ProtectedRoute>
+              <InscripcionEditar />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/clases"
+          element={
+            <ProtectedRoute>
+              <Clases />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/alumnos/:alumnoId/clases/nueva"
+          element={
+            <ProtectedRoute>
+              <ClaseNueva />
             </ProtectedRoute>
           }
         />
