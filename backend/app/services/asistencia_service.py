@@ -176,3 +176,43 @@ class AsistenciaService:
         return AsistenciaRepository.get_by_id(
             asistencia_id
         )
+
+    
+    @staticmethod
+    def get_by_clase(clase_id):
+        clase = ClaseRepository.get_by_id(clase_id)
+
+        if not clase:
+            raise NotFoundError("Clase no encontrada.")
+
+        profesor_id = get_current_profesor_id()
+
+        if not ClaseRepository.belongs_to_profesor(
+            clase_id, profesor_id
+        ):
+            raise ForbiddenError(
+                "No tienes permiso para consultar esta clase."
+            )
+
+        return AsistenciaRepository.get_by_clase(clase_id)
+
+    
+    @staticmethod
+    def get_alumnos_by_clase(clase_id):
+        clase = ClaseRepository.get_by_id(clase_id)
+
+        if not clase:
+            raise NotFoundError("Clase no encontrada.")
+
+        profesor_id = get_current_profesor_id()
+
+        if not ClaseRepository.belongs_to_profesor(
+            clase_id, profesor_id
+        ):
+            raise ForbiddenError(
+                "No tienes permiso para consultar esta clase."
+            )
+
+        return AsistenciaRepository.get_alumnos_by_clase(
+            clase_id
+        )

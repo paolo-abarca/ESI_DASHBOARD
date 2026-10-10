@@ -20,6 +20,22 @@ def get_asistencias():
 
     return jsonify(asistencias), 200
 
+@asistencia_bp.get("/clase/<int:clase_id>")
+@jwt_required()
+def get_asistencias_by_clase(clase_id):
+    asistencias = AsistenciaService.get_by_clase(clase_id)
+
+    return jsonify(asistencias), 200
+
+@asistencia_bp.get("/clase/<int:clase_id>/alumnos")
+@jwt_required()
+def get_alumnos_by_clase(clase_id):
+    alumnos = AsistenciaService.get_alumnos_by_clase(
+        clase_id
+    )
+
+    return jsonify(alumnos), 200
+
 @asistencia_bp.get("/<int:asistencia_id>")
 @jwt_required()
 def get_asistencia(asistencia_id):

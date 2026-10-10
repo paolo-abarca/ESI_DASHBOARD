@@ -179,3 +179,76 @@ class AsistenciaRepository:
         )
 
         return result is not None
+
+    
+    @staticmethod
+    def get_by_clase(clase_id):
+        return BaseRepository.execute_query(
+            """
+            SELECT
+                a.id,
+                a.clase_id,
+                a.inscripcion_id,
+                CONCAT(al.nombre, ' ', al.apellido)
+                    AS alumno_nombre,
+                CONCAT(p.nombre, ' ', p.apellido)
+                    AS profesor_nombre,
+                i.nombre AS instrumento_nombre,
+                c.fecha,
+                c.hora_inicio,
+                c.hora_fin,
+                a.estado,
+                a.created_at,
+                a.updated_at
+            FROM asistencia a
+            INNER JOIN clase c
+                ON c.id = a.clase_id
+            INNER JOIN inscripcion ins
+                ON ins.id = a.inscripcion_id
+            INNER JOIN alumno al
+                ON al.id = ins.alumno_id
+            INNER JOIN profesor_instrumento pi
+                ON pi.id = ins.profesor_instrumento_id
+            INNER JOIN profesor p
+                ON p.id = pi.profesor_id
+            INNER JOIN instrumento i
+                ON i.id = pi.instrumento_id
+            WHERE a.clase_id = %s
+            ORDER BY al.apellido ASC, al.nombre ASC
+            """,
+            (clase_id,),
+            fetchall=True
+        )
+
+    @staticmethod
+    def get_alumnos_by_clase(clase_id):
+        return BaseRepository.execute_query(
+            """
+            SELECT
+                ins.id AS inscripcion_id,
+                ins.alumno_id,
+                CONCAT(al.nombre, ' ', al.apellido)
+                    AS alumno_nombre,
+                i.nombre AS instrumento_nombre,
+                a.id AS asistencia_id,
+                a.estado AS estado_asistencia
+            FROM clase c
+            INNER JOIN inscripcion ins
+                ON ins.id = c.inscripcion_id
+            INNER JOIN alumno al
+                ON al.id = ins.alumno_id
+            INNER JOIN profesor_instrumento pi
+                ON pi.id = ins.profesor_instrumento_id
+            INNER JOIN instrumento i
+                ON i.id = pi.instrumento_id
+            LEFT JOIN asistencia a
+                ON a.clase_id = c.id
+                AND a.inscripcion_id = ins.id
+            WHERE c.id = %s
+            AND c.activo = TRUE
+            AND ins.activo = TRUE
+            ORDER BY al.apellido ASC, al.nombre ASC
+            """,
+            (clase_id,),
+            fetchall=True
+        )

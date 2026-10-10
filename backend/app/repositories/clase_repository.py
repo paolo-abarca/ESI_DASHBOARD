@@ -179,7 +179,7 @@ class ClaseRepository:
             WHERE c.id = %s
             AND pi.profesor_id = %s
             AND c.activo = TRUE
-            AND ins.acivo = TRUE
+            AND ins.activo = TRUE
             AND pi.activo = TRUE
             LIMIT 1
             """,
