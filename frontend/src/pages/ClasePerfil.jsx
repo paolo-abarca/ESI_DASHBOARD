@@ -97,6 +97,13 @@ function ClasePerfil() {
 
                     <div className="flex gap-2">
                         <button
+                            onClick={() => navigate(`/clases/${claseId}/asistencia`)}
+                            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
+                        >
+                            Control de asistencia
+                        </button>
+
+                        <button
                             onClick={() =>
                                 navigate(`/clases/${claseId}/editar`)
                             }
