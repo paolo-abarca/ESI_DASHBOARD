@@ -98,13 +98,23 @@ function Login() {
                         </div>
                     )}
 
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full rounded-lg bg-indigo-600 px-4 py-3 font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                        {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
-                    </button>
+                    <div className="flex gap-3">
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="flex-1 rounded-lg bg-indigo-600 px-4 py-3 font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                            {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => navigate('/registro')}
+                            className="flex-1 rounded-lg border border-indigo-600 px-4 py-3 font-semibold text-indigo-600 transition hover:bg-indigo-50"
+                        >
+                            Regístrate
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>

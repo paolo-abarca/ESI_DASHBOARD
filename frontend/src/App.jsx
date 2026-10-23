@@ -21,12 +21,14 @@ import CalificacionEditar from './pages/CalificacionEditar'
 import Tareas from './pages/Tareas'
 import TareaNueva from './pages/TareaNueva'
 import TareaEditar from './pages/TareaEditar'
+import Registro from './pages/Registro'
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/Login" element={<Login />} />
+        <Route path="/registro" element={<Registro />} />
         <Route
           path="/dashboard"
           element={
