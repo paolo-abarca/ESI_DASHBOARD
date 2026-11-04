@@ -30,6 +30,40 @@ class AlumnoRepository:
         )
 
     @staticmethod
+    def get_by_profesor(profesor_id: int):
+        return BaseRepository.execute_query(
+            """
+            SELECT DISTINCT
+                a.id,
+                a.nombre,
+                a.apellido,
+                a.fecha_nacimiento,
+                a.celular,
+                a.genero,
+                a.imagen,
+                a.iglesia_id,
+                ig.nombre AS iglesia_nombre,
+                a.activo,
+                a.created_at,
+                a.updated_at
+            FROM alumno a
+            INNER JOIN inscripcion ins
+                ON ins.alumno_id = a.id
+            INNER JOIN profesor_instrumento pi
+                ON pi.id = ins.profesor_instrumento_id
+            LEFT JOIN iglesia ig
+                ON ig.id = a.iglesia_id
+            WHERE pi.profesor_id = %s
+                AND pi.activo = TRUE
+                AND ins.activo = TRUE
+                AND a.activo = TRUE
+            ORDER BY a.apellido ASC, a.nombre ASC
+            """,
+            (profesor_id,),
+            fetchall=True
+        )
+
+    @staticmethod
     def get_by_id(alumno_id: int):
 
         return BaseRepository.execute_query(
