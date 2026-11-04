@@ -31,3 +31,7 @@ export async function apiRequest(endpoint, options = {}) {
 
     return data
 }
+
+export async function obtenerAlumnosPorProfesor(profesorId) {
+    return apiRequest(`/profesores/${profesorId}/alumnos`)
+}
