@@ -6,6 +6,7 @@ from app.repositories.iglesia_repository import IglesiaRepository
 from flask_jwt_extended import get_jwt_identity
 from app.exceptions.forbidden import ForbiddenError
 from app.utils.auth_utils import get_current_profesor_id
+from app.repositories.profesor_repository import ProfesorRepository
 
 class AlumnoService:
 
@@ -17,6 +18,20 @@ class AlumnoService:
         for alumno in alumnos:
             alumno["activo"] = bool(alumno["activo"])
 
+        return alumnos
+
+    @staticmethod
+    def get_by_profesor(profesor_id: int):
+        profesor = ProfesorRepository.get_by_id(profesor_id)
+    
+        if profesor is None:
+            raise NotFoundError("Profesor no encontrado.")
+    
+        alumnos = AlumnoRepository.get_by_profesor(profesor_id)
+    
+        for alumno in alumnos:
+            alumno["activo"] = bool(alumno["activo"])
+    
         return alumnos
 
     @staticmethod
