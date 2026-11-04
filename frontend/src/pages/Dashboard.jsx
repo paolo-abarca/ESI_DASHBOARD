@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../hooks/useAuth"
 import { getProfesores } from '../services/profesorService'
+import { UsersRound, ArrowRight } from 'lucide-react'
+import { obtenerAlumnosPorProfesor } from '../services/api'
 
 function Dashboard() {
     const navigate = useNavigate()
@@ -18,7 +20,19 @@ function Dashboard() {
                 setError('')
 
                 const data = await getProfesores()
-                setProfesores(data)
+
+                const profesoresConConteos = await Promise.all(
+                    data.map(async (item) => {
+                        const respuesta = await obtenerAlumnosPorProfesor(item.id)
+
+                        return {
+                            ...item,
+                            cantidad_alumnos: respuesta.data.length
+                        }
+                    })
+                )
+
+                setProfesores(profesoresConConteos)
             } catch (error) {
                 setError(error.message)
             } finally {
@@ -38,63 +52,34 @@ function Dashboard() {
     return (
         <div className="min-h-screen bg-slate-100">
             {/* HEADER */}
-            <header className="border-b border-slate-200 bg-white">
-                <div className="mx-auto flex max-w-7x1 items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-                    <div>
-                        <h1 className="text-xl font-bold text-slate-900">
-                            ESI Dashboard
-                        </h1>
+            <header className="bg-slate-100">
+                <div className="flex items-center justify-end gap-4 px-6 py-4 sm:px-8">
+                    <span className="text-sm font-medium text-slate-700">
+                        Profesor
+                    </span>
 
-                        <p className="text-sm text-slate-500">
-                            Gestión académica
-                        </p>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                        <div className="hidden text-right sm:block">
-                            <p className="text-sm font-semibold text-slate-900">
-                                {profesor?.nombre} {profesor?.apellido}
-                            </p>
-
-                            <p className="text-xs text-slate-500">
-                                Profesor
-                            </p>
-                        </div>
-
-                        <button
-                            onClick={handleLogout}
-                            className="rounded-lg bg-red-600 px-4 py-2 font-semibold text-white transition hover:bg-red-700"
-                        >
-                            Salir
-                        </button>
-                    </div>
+                    <button
+                        onClick={handleLogout}
+                        className="rounded-lg bg-red-600 px-4 py-2 font-semibold text-white transition hover:bg-red-700"
+                    >
+                        Salir
+                    </button>
                 </div>
             </header>
 
             {/* CONTENIDO */}
-            <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+            <main className="mx-auto max-w-7xl px-12.5 pt-2 pb-8">
                 <section>
                     <h2 className="text-3xl font-bold text-slate-900">
                         Bienvenido, {profesor?.nombre}
                     </h2>
-
+                
                     <p className="mt-2 text-slate-600">
                         Selecciona un profesor para consultar su información.
                     </p>
                 </section>
 
                 <section className="mt-8">
-                    <div className="flex items-center justify-between">
-                        <h3 className="text-xl font-bold text-slate-900">
-                            Profesores
-                        </h3>
-
-                        {!loading && (
-                            <span className="text-sm text-slate-500">
-                                {profesores.length} profesores
-                            </span>
-                        )}
-                    </div>
 
                     {loading && (
                         <div className="mt-6 rounded-xl bg-white p-8 text-center shadow-sm">
@@ -119,130 +104,69 @@ function Dashboard() {
                     )}
 
                     {!loading && !error && profesores.length > 0 && (
-                        <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                             {profesores.map((item) => {
                                 const esActual = item.id === profesor?.id
-
+                                
                                 return (
                                     <button
                                         key={item.id}
+                                        type="button"
                                         onClick={() => navigate(`/profesores/${item.id}`)}
-                                        className="group rounded-2xl bg-white p-6 text-left shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+                                        className={`group w-full overflow-hidden rounded-3xl border-2 bg-white p-4 text-left shadow-sm shadow-slate-200/60 transition duration-200 hover:-translate-y-1 hover:shadow-lg ${
+                                            esActual
+                                                ? 'border-blue-500'
+                                                : 'border-transparent'
+                                        }`}
                                     >
-                                        <div className="flex items-center gap-4">
-                                            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-lg font-bold text-indigo-700">
-                                                {item.nombre?.charAt(0).toUpperCase()}
-                                                {item.apellido?.charAt(0).toUpperCase()}
-                                            </div>
-
-                                            <div className="min-w-0">
-                                                <div className="flex flex-wrap items-center gap-2">
-                                                    <h4 className="font-bold text-slate-900">
-                                                        {item.nombre} {item.apellido}
-                                                    </h4>
-
-                                                    {esActual && (
-                                                        <span className="rounded-full bg-indigo-100 px-2 py-1 text-xs font-semibold text-indigo-700">
-                                                            Tú
-                                                        </span>
-                                                    )}
-                                                </div>
-
-                                                <p className="mt-1 truncate text-sm text-slate-500">
-                                                    {item.email}
-                                                </p>
+                                        {/* Fotografía del profesor */}
+                                        <div className="flex justify-center">
+                                            <div className="h-48 w-full overflow-hidden rounded-2xl bg-slate-100">
+                                                <img
+                                                    src={
+                                                        item.foto_url
+                                                    }
+                                                    alt={`${item.nombre} ${item.apellido}`}
+                                                    className="h-full w-full object-cover object-center"
+                                                />
                                             </div>
                                         </div>
-
-                                        <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4">
-                                            <span className="text-sm font-medium text-slate-500">
-                                                {esActual
-                                                    ? 'Ver mi perfil'
-                                                    : 'Ver perfil'}
+                                        
+                                        {/* Información */}
+                                        <div className="px-1 pt-5">
+                                            <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                                                Profesor
+                                            </p>
+                                            
+                                            <h4 className="mt-1 text-xl font-bold text-slate-900">
+                                                {item.nombre} {item.apellido}
+                                            </h4>
+                
+                                            {/* Cantidad de alumnos */}
+                                            <div className="mt-4 flex items-center gap-2 text-blue-600">
+                                                <UsersRound size={20} strokeWidth={2} />
+                                                <span className="text-sm font-semibold">
+                                                    {item.cantidad_alumnos ?? item.total_alumnos ?? 0} alumnos
+                                                </span>
+                                            </div>
+                                        </div>
+                
+                                        {/* Acceso al perfil */}
+                                        <div className="mt-5 flex items-center justify-between border-t border-slate-200 px-1 pt-4">
+                                            <span className="text-sm font-semibold text-slate-600 transition group-hover:text-blue-600">
+                                                {esActual ? 'Ver mi perfil' : 'Ver perfil'}
                                             </span>
-
-                                            <span className="text-indigo-600 transition group-hover:translate-x-1">
-                                                →
-                                            </span>
+                
+                                            <ArrowRight
+                                                size={18}
+                                                className="text-blue-600 transition group-hover:translate-x-1"
+                                            />
                                         </div>
                                     </button>
                                 )
                             })}
                         </div>
                     )}
-                </section>
-
-                {/* MÓDULOS */}
-                <section className="mt-8">
-                    <h3 className="text-xl font-bold text-slate-900">
-                        Gestión académica
-                    </h3>
-
-                    <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-
-                        <button
-                            onClick={() => navigate('/alumnos')}
-                            className="group rounded-2xl bg-white p-6 text-left shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
-                        >
-                            <div className="flex items-center gap-4">
-                                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-indigo-100 text-2xl">
-                                    👨‍🎓
-                                </div>
-
-                                <div>
-                                    <h4 className="font-bold text-slate-900">
-                                        Alumnos
-                                    </h4>
-
-                                    <p className="mt-1 text-sm text-slate-500">
-                                        Gestionar alumnos registrados
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4">
-                                <span className="text-sm font-medium text-slate-500">
-                                    Ver alumnos
-                                </span>
-
-                                <span className="text-indigo-600 transition group-hover:translate-x-1">
-                                    →
-                                </span>
-                            </div>
-                        </button>
-
-                        <button
-                            onClick={() => navigate('/clases')}
-                            className="group rounded-2xl bg-white p-6 text-left shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
-                        >
-                            <div className="flex items-center gap-4">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-2xl">
-                                    📚
-                                </div>
-
-                                <div>
-                                    <h4 className="mt-4 text-lg font-bold text-slate-900">
-                                        Clases
-                                    </h4>
-
-                                    <p className="mt-1 text-sm text-slate-500">
-                                        Gestionar clases y sesiones
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4">
-                                <span className="text-sm font-medium text-slate-500">
-                                    Ver clases
-                                </span>
-
-                                <span className="text-indigo-600 transition group-hover:translate-x-1">
-                                    →
-                                </span>
-                            </div>
-                        </button>
-
-                    </div>
                 </section>
             </main>
         </div>
