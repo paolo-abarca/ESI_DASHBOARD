@@ -9,6 +9,7 @@ from app.services.profesor_instrumento_service import (
     ProfesorInstrumentoService
 )
 from app.utils.permissions import own_profesor_required
+from app.services.alumno_service import AlumnoService
 
 profesor_bp = Blueprint("profesores", __name__)
 
@@ -32,6 +33,17 @@ def get_by_id(profesor_id):
     return {
         "success": True,
         "data": profesor
+    }
+
+@profesor_bp.get("/profesores/<int:profesor_id>/alumnos")
+@jwt_required()
+def get_alumnos(profesor_id):
+    alumnos = AlumnoService.get_by_profesor(profesor_id)
+
+    return {
+        "success": True,
+        "data": alumnos,
+        "total": len(alumnos)
     }
 
 @profesor_bp.post("/profesores")
