@@ -1,3 +1,4 @@
+import cloudinary
 from flask import Flask
 from app.config import Config
 from app.extensions import cors, jwt
@@ -19,6 +20,13 @@ from app.routes.tarea_routes import tarea_bp
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+
+    cloudinary.config(
+        cloud_name=app.config["CLOUDINARY_CLOUD_NAME"],
+        api_key=app.config["CLOUDINARY_API_KEY"],
+        api_secret=app.config["CLOUDINARY_API_SECRET"],
+        secure=True
+    )
 
     cors.init_app(app)
     jwt.init_app(app)
