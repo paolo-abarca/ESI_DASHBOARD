@@ -68,7 +68,7 @@ function Dashboard() {
             </header>
 
             {/* CONTENIDO */}
-            <main className="mx-auto max-w-7xl px-12.5 pt-2 pb-8">
+            <main className="mx-auto max-w-7xl px-12.5 pb-8">
                 <section>
                     <h2 className="text-3xl font-bold text-slate-900">
                         Bienvenido, {profesor?.nombre}
