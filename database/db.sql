@@ -91,6 +91,8 @@ CREATE TABLE profesor
 
     foto_url TEXT,
 
+    foto_public_id VARCHAR(255),
+
     ultimo_login DATETIME NULL,
 
     activo BOOLEAN NOT NULL DEFAULT TRUE,
