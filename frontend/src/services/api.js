@@ -3,8 +3,10 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000'
 export async function apiRequest(endpoint, options = {}) {
     const token = localStorage.getItem('access_token')
 
+    const esFormData = options.body instanceof FormData
+
     const headers = {
-        'Content-Type': 'application/json',
+        ...(!esFormData && { 'Content-Type': 'application/json' }),
         ...options.headers,
     }
 
@@ -34,4 +36,20 @@ export async function apiRequest(endpoint, options = {}) {
 
 export async function obtenerAlumnosPorProfesor(profesorId) {
     return apiRequest(`/profesores/${profesorId}/alumnos`)
+}
+
+export async function subirFotoProfesor(profesorId, archivo) {
+    const formData = new FormData()
+    formData.append('foto', archivo)
+
+    return apiRequest(`/profesores/${profesorId}/foto`, {
+        method: 'POST',
+        body: formData
+    })
+}
+
+export async function eliminarFotoProfesor(profesorId) {
+    return apiRequest(`/profesores/${profesorId}/foto`, {
+        method: 'DELETE'
+    })
 }
