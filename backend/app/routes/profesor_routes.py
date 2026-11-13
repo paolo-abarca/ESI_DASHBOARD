@@ -90,6 +90,65 @@ def update(profesor_id):
         "data": profesor
     }
 
+@profesor_bp.post("/profesores/<int:profesor_id>/foto")
+@jwt_required()
+@own_profesor_required
+def upload_photo(profesor_id):
+
+    foto = request.files.get("foto")
+
+    if not foto:
+        return {
+            "success": False,
+            "message": "Debes seleccionar una imagen."
+        }, 400
+
+    tipos_permitidos = [
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+    ]
+
+    if foto.mimetype not in tipos_permitidos:
+        return {
+            "success": False,
+            "message": "Formato no permitido. Usa JPG, PNG o WEBP."
+        }, 400
+
+    # Límite de 5 MB
+    foto.stream.seek(0, 2)
+    tamaño = foto.stream.tell()
+    foto.stream.seek(0)
+
+    if tamaño > 5 * 1024 * 1024:
+        return {
+            "success": False,
+            "message": "La imagen no puede superar los 5 MB."
+        }, 400
+
+    resultado = ProfesorService.upload_photo(
+        profesor_id=profesor_id,
+        file=foto
+    )
+
+    return {
+        "success": True,
+        "message": "Foto actualizada correctamente.",
+        "data": resultado
+    }
+
+@profesor_bp.delete("/profesores/<int:profesor_id>/foto")
+@jwt_required()
+@own_profesor_required
+def delete_photo(profesor_id):
+    resultado = ProfesorService.delete_photo(profesor_id)
+
+    return {
+        "success": True,
+        "message": "Fotografía eliminada correctamente.",
+        "data": resultado
+    }, 200
+
 @profesor_bp.patch("/profesores/<int:profesor_id>/desactivar")
 @jwt_required()
 @own_profesor_required
