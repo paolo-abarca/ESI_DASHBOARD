@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getProfesorById, updateProfesor } from '../services/profesorService'
+import {
+    subirFotoProfesor,
+    eliminarFotoProfesor
+} from '../services/api'
 import { useAuth } from '../hooks/useAuth'
 
 function ProfesorEditar() {
@@ -20,6 +24,11 @@ function ProfesorEditar() {
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
 
+    const [fotoUrl, setFotoUrl] = useState(null)
+    const [archivoFoto, setArchivoFoto] = useState(null)
+    const [eliminarFoto, setEliminarFoto] = useState(false)
+    const [fotoOriginal, setFotoOriginal] = useState(null)
+
     const esPropietario =
         profesorActual &&
         Number(profesorActual.id) === Number(profesorId)
@@ -30,6 +39,11 @@ function ProfesorEditar() {
                 setLoading(true)
 
                 const data = await getProfesorById(profesorId)
+
+                setFotoUrl(data.foto_url || null)
+                setFotoOriginal(data.foto_url || null)
+                setArchivoFoto(null)
+                setEliminarFoto(false)
 
                 setForm({
                     nombre: data.nombre || '',
@@ -47,6 +61,14 @@ function ProfesorEditar() {
         loadProfesor()
     }, [profesorId])
 
+    useEffect(() => {
+        return () => {
+            if (fotoUrl?.startsWith('blob:')) {
+                URL.revokeObjectURL(fotoUrl)
+            }
+        }
+    }, [fotoUrl])
+
     function handleChange(event) {
         const { name, value } = event.target
 
@@ -55,6 +77,45 @@ function ProfesorEditar() {
             [name]: value,
         }))
 
+        setError('')
+        setSuccess('')
+    }
+
+    function handleSubirFoto(event) {
+        const archivo = event.target.files?.[0]
+        event.target.value = ''
+
+        if (!archivo) return
+
+        const tiposPermitidos = [
+            'image/jpeg',
+            'image/png',
+            'image/webp'
+        ]
+
+        if (!tiposPermitidos.includes(archivo.type)) {
+            setError('Selecciona una imagen JPG, PNG o WEBP.')
+            return
+        }
+
+        if (archivo.size > 5 * 1024 * 1024) {
+            setError('La imagen no puede superar los 5 MB.')
+            return
+        }
+
+        const vistaPrevia = URL.createObjectURL(archivo)
+
+        setFotoUrl(vistaPrevia)
+        setArchivoFoto(archivo)
+        setEliminarFoto(false)
+        setError('')
+        setSuccess('')
+    }
+
+    function handleEliminarFoto() {
+        setFotoUrl(null)
+        setArchivoFoto(null)
+        setEliminarFoto(true)
         setError('')
         setSuccess('')
     }
@@ -77,23 +138,48 @@ function ProfesorEditar() {
                 datos.password = form.password
             }
 
+            // Primero guardamos los datos personales.
             const profesorActualizado = await updateProfesor(
                 profesorId,
                 datos,
             )
 
-            setSuccess('Perfil actualizado correctamente.')
+            // Después guardamos la operación pendiente de la fotografía.
+            let nuevaFotoUrl = fotoOriginal
 
-            // Si estamos editando nuestro propio perfil,
-            // actualizamos también el contexto.
-            if (esPropietario) {
-                setProfesor(profesorActualizado)
+            if (archivoFoto) {
+                const respuesta = await subirFotoProfesor(
+                    profesorId,
+                    archivoFoto
+                )
+
+                nuevaFotoUrl = respuesta.data.foto_url
+            } else if (eliminarFoto) {
+                await eliminarFotoProfesor(profesorId)
+                nuevaFotoUrl = null
             }
+
+            // Actualizamos el contexto si es nuestro perfil.
+            if (esPropietario) {
+                setProfesor({
+                    ...profesorActual,
+                    ...profesorActualizado,
+                    foto_url: nuevaFotoUrl
+                })
+            }
+
+            setFotoUrl(nuevaFotoUrl)
+            setFotoOriginal(nuevaFotoUrl)
+            setArchivoFoto(null)
+            setEliminarFoto(false)
 
             setForm((current) => ({
                 ...current,
-                password: '',
+                password: ''
             }))
+
+            setSuccess('Perfil actualizado correctamente.')
+
         } catch (error) {
             setError(error.message)
         } finally {
@@ -175,6 +261,56 @@ function ProfesorEditar() {
                         onSubmit={handleSubmit}
                         className="mt-8 space-y-5"
                     >
+
+                        <div className="flex flex-col items-center gap-4 border-b border-slate-200 pb-6 sm:flex-row">
+                            <div className="h-24 w-24 overflow-hidden rounded-full border-4 border-slate-100 bg-slate-200">
+                                {fotoUrl ? (
+                                    <img
+                                        src={fotoUrl}
+                                        alt="Fotografía del profesor"
+                                        className="h-full w-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="flex h-full items-center justify-center text-3xl font-bold text-slate-500">
+                                        {form.nombre?.charAt(0)?.toUpperCase() || '?'}
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="flex flex-col items-center gap-2 sm:items-start">
+                                <p className="font-semibold text-slate-800">
+                                    Fotografía de perfil
+                                </p>
+
+                                <div className="flex flex-wrap justify-center gap-2">
+                                    <label className="cursor-pointer rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">
+                                        {fotoUrl ? 'Actualizar fotografía' : 'Subir fotografía'}
+
+                                        <input
+                                            type="file"
+                                            accept="image/jpeg,image/png,image/webp"
+                                            className="hidden"
+                                            onChange={handleSubirFoto}
+                                        />
+                                    </label>
+
+                                    {fotoUrl && (
+                                        <button
+                                            type="button"
+                                            onClick={handleEliminarFoto}
+                                            className="rounded-lg border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50"
+                                        >
+                                            Eliminar
+                                        </button>
+                                    )}
+                                </div>
+
+                                <p className="text-xs text-slate-500">
+                                    JPG, PNG o WEBP. Máximo 5 MB.
+                                </p>
+                            </div>
+                        </div>
+
                         <div className="grid gap-5 sm:grid-cols-2">
                             <div>
                                 <label
@@ -271,9 +407,7 @@ function ProfesorEditar() {
                                 disabled={saving}
                                 className="rounded-lg bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
                             >
-                                {saving
-                                    ? 'Guardando...'
-                                    : 'Guardar cambios'}
+                                {saving ? 'Guardando cambios...' : 'Guardar cambios'}
                             </button>
                         </div>
                     </form>
